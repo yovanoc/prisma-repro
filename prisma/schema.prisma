@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FirstTable {
+  id     String       @id @default(cuid())
+  second SecondTable?
+}
+
+model SecondTable {
+  id      String      @id @default(cuid())
+  first   FirstTable  @relation(fields: [firstId], references: [id])
+  firstId String      @unique
+  third   ThirdTable? @relation(fields: [thirdId], references: [id])
+  thirdId String?     @unique
+}
+
+model DataWrapper {
+  id           String      @id @default(cuid())
+  data1        Int         @default(0)
+  data2        Int         @default(0)
+  data3        Int         @default(0)
+  wrappedData1 ThirdTable? @relation("wrappedData1")
+  wrappedData2 ThirdTable? @relation("wrappedData2")
+}
+
+model ThirdTable {
+  id             String       @id @default(cuid())
+  second         SecondTable?
+  data1          Int          @default(0)
+  data2          Int          @default(0)
+  wrappedData1   DataWrapper  @relation("wrappedData1", fields: [wrappedData1Id], references: [id])
+  wrappedData1Id String       @unique
+  wrappedData2   DataWrapper  @relation("wrappedData2", fields: [wrappedData2Id], references: [id])
+  wrappedData2Id String       @unique
+}
